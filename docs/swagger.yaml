@@ -1,0 +1,722 @@
+basePath: /api/v1
+definitions:
+  auth.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  auth.RefreshRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  auth.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  auth.RegisterResponse:
+    properties:
+      message:
+        example: User registered successfully
+        type: string
+    type: object
+  auth.TokenResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  auth.ValidateRequest:
+    properties:
+      token:
+        type: string
+    type: object
+  auth.ValidateResponse:
+    properties:
+      error:
+        type: string
+      expires_at:
+        type: string
+      user_id:
+        type: string
+      valid:
+        type: boolean
+    type: object
+  handler.ErrorInfo:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  handler.Response:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/handler.ErrorInfo'
+      meta: {}
+    type: object
+  order.CreateOrderRequest:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/order.OrderItemRequest'
+        type: array
+    type: object
+  order.CreateOrderResponse:
+    properties:
+      created_at:
+        type: string
+      currency:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/order.OrderItemResponse'
+        type: array
+      status:
+        type: string
+      total:
+        type: number
+    type: object
+  order.OrderItemRequest:
+    properties:
+      product_id:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  order.OrderItemResponse:
+    properties:
+      price:
+        type: number
+      product_id:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  order.OrderResponse:
+    properties:
+      created_at:
+        type: string
+      currency:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/order.OrderItemResponse'
+        type: array
+      status:
+        type: string
+      total:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  order.UpdateOrderRequest:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/order.OrderItemRequest'
+        type: array
+      status:
+        type: string
+    type: object
+  product.ImageResponse:
+    properties:
+      height:
+        type: integer
+      url:
+        type: string
+      width:
+        type: integer
+    type: object
+  product.ProductResponse:
+    properties:
+      attributes:
+        additionalProperties:
+          type: string
+        type: object
+      available:
+        type: boolean
+      created_at:
+        type: string
+      currency:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      images:
+        items:
+          $ref: '#/definitions/product.ImageResponse'
+        type: array
+      name:
+        type: string
+      price:
+        type: number
+      thumbnail:
+        $ref: '#/definitions/product.ImageResponse'
+      updated_at:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is a sample server for a product showcase project.
+  termsOfService: http://swagger.io/terms/
+  title: Test Project One API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return access and refresh tokens
+      parameters:
+      - description: Login credentials
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.TokenResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+      summary: Login user
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Get a new access token using a refresh token
+      parameters:
+      - description: Refresh token
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.TokenResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+      summary: Refresh token
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with email and password
+      parameters:
+      - description: Registration details
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.RegisterResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+      summary: Register a new user
+      tags:
+      - auth
+  /auth/validate:
+    post:
+      consumes:
+      - application/json
+      description: Check if the provided access token is valid
+      parameters:
+      - description: Access token
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/auth.ValidateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.ValidateResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+      summary: Validate token
+      tags:
+      - auth
+  /orders:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of user orders
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/order.OrderResponse'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List orders
+      tags:
+      - order
+    post:
+      consumes:
+      - application/json
+      description: Create a new order with items
+      parameters:
+      - description: Order details
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/order.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/order.CreateOrderResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new order
+      tags:
+      - order
+  /orders/{order_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a specific order
+      parameters:
+      - description: Order ID
+        in: path
+        name: order_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/order.OrderResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Get an order by ID
+      tags:
+      - order
+    patch:
+      consumes:
+      - application/json
+      description: Update the status or items of an existing order
+      parameters:
+      - description: Order ID
+        in: path
+        name: order_id
+        required: true
+        type: string
+      - description: Order update details
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/order.UpdateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/order.OrderResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "403":
+          description: Forbidden
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Update an order
+      tags:
+      - order
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of products
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/product.ProductResponse'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+      summary: List products
+      tags:
+      - product
+  /products/{product_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a product
+      parameters:
+      - description: Product ID
+        in: path
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/product.ProductResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/handler.ErrorInfo'
+              type: object
+      summary: Get a product by ID
+      tags:
+      - product
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

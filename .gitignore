@@ -1,0 +1,44 @@
+
+/**/*.env
+*.env
+.env
+.env.*
+!/.env.example
+
+# Go build
+/bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# DB
+/pgdata/
+/_data/
+
+# Prompts/skills
+/.agents/
+/plans/
+skills-lock.json
+
+# IDE
+*/.vscode/
+.vscode/
+/.idea/
+.idea/
+*.swp
+*~
+
+# Logs
+*.log
+
+coverage.out
+coverage.html
+profile.out
+
+.DS_Store
+Thumbs.db
+
