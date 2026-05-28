@@ -31,6 +31,8 @@
 * Нет тестов (unit/integration).
 * Хэширование паролей без соли
 
+*Данные товаров и картинки для seed-скрипта взяты из https://github.com/octaprice/ecommerce-product-dataset*
+
 
 ## Настройка проекта
 
@@ -102,3 +104,9 @@ product-catalog-backend/
 ├── Makefile
 ├── go.mod
 └── README.md
+```
+
+## Прочее
+
+* Для автоматизации действий используется `Makefile`
+* Swagger-документация(пакет `swaggo`) доступна в каталоге `docs` или `http://HOST:PORT/swagger/index.html` 
