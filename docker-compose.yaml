@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:16.1-alpine3.19
-    container_name: test-project-one-db-debug
+    container_name: product-catalog-template
     restart: unless-stopped
     env_file:
       - .env
